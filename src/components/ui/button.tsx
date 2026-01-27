@@ -104,9 +104,9 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
       </>
     ) : (
       <>
-        {/* Shimmer effect on hover for primary variant */}
+        {/* Highlight effect on hover for primary variant */}
         {variant === 'primary' && (
-          <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
+          <span className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />
         )}
         <span className="relative flex items-center gap-2">
           {children}

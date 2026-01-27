@@ -42,3 +42,35 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
 
   return [ref, isVisible];
 }
+
+/**
+ * Observes all .reveal, .reveal-left, .reveal-right, .reveal-scale children
+ * within a container ref, adding 'visible' class when they enter the viewport.
+ */
+export function useScrollRevealContainer(options: UseScrollRevealOptions = {}): RefObject<HTMLDivElement | null> {
+  const { threshold = 0.1, rootMargin = '0px 0px -50px 0px' } = options;
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = ref.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold, rootMargin }
+    );
+
+    const elements = container.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [threshold, rootMargin]);
+
+  return ref;
+}

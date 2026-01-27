@@ -3,23 +3,11 @@
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { X, Zap, ArrowRight } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
-
-const leadSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  name: z.string().optional(),
-  company: z.string().optional(),
-  role: z.enum(['owner', 'estimator', 'ops', 'other']).optional(),
-  trade: z.enum(['electrical', 'hvac', 'plumbing', 'general', 'other']).optional(),
-  estimate_volume: z.string().optional(),
-  pain_point: z.string().max(2000).optional(),
-  website: z.string().max(0, 'This field should be empty'), // Honeypot
-});
-
-type LeadFormData = z.infer<typeof leadSchema>;
+import { BlueprintIcon } from '@/components/icons/trade-icons';
+import { leadFormSchema, type LeadFormData } from '@/lib/schemas';
 
 interface LeadDrawerProps {
   isOpen: boolean;
@@ -37,7 +25,7 @@ export function LeadDrawer({ isOpen, onClose, sourceProduct }: LeadDrawerProps) 
     formState: { errors, isSubmitting },
     reset,
   } = useForm<LeadFormData>({
-    resolver: zodResolver(leadSchema),
+    resolver: zodResolver(leadFormSchema),
   });
 
   // Close on escape key
@@ -67,7 +55,7 @@ export function LeadDrawer({ isOpen, onClose, sourceProduct }: LeadDrawerProps) 
 
   const onSubmit = async (data: LeadFormData) => {
     // Check honeypot
-    if (data.website) {
+    if (data.hp_field) {
       showToast('Something went wrong. Please try again.', 'error');
       return;
     }
@@ -119,7 +107,7 @@ export function LeadDrawer({ isOpen, onClose, sourceProduct }: LeadDrawerProps) 
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-ink)]">
-                <Zap className="h-5 w-5 fill-[var(--color-amber)] text-[var(--color-amber)]" />
+                <BlueprintIcon size={20} className="text-[var(--color-amber)]" />
               </div>
               <div>
                 <h2 id="drawer-title" className="font-display text-lg font-bold text-[var(--color-ink)]">
@@ -143,7 +131,7 @@ export function LeadDrawer({ isOpen, onClose, sourceProduct }: LeadDrawerProps) 
               {/* Honeypot - hidden from users */}
               <input
                 type="text"
-                {...register('website')}
+                {...register('hp_field')}
                 className="hidden"
                 tabIndex={-1}
                 autoComplete="off"

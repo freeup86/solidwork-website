@@ -11,7 +11,7 @@ function ContactFormSkeleton() {
   return (
     <div>
       {/* Hero skeleton */}
-      <section className="bg-gradient-to-b from-[var(--color-muted)] to-white py-16">
+      <section className="bg-[var(--color-muted)] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <div className="mx-auto h-10 w-64 animate-pulse rounded bg-gray-200" />

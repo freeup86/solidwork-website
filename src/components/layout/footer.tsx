@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Zap, Mail, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { SolidBoltIcon, BlueprintIcon } from '@/components/icons/trade-icons';
 
 const footerLinks = {
   products: [
@@ -22,7 +23,7 @@ function Logo() {
     <Link href="/" className="group flex items-center gap-3">
       <div className="relative flex h-10 w-10 items-center justify-center">
         <div className="absolute inset-0 rounded-xl bg-[var(--color-ink)]" />
-        <Zap className="relative h-5 w-5 fill-[var(--color-amber)] text-[var(--color-amber)]" />
+        <SolidBoltIcon size={20} className="relative text-[var(--color-amber)]" />
       </div>
       <div>
         <div className="font-display text-base font-bold text-[var(--color-ink)]">
@@ -56,7 +57,7 @@ export function Footer() {
             {/* Newsletter signup teaser */}
             <div className="mt-8 flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-white p-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-amber)]/10">
-                <Mail className="h-5 w-5 text-[var(--color-amber)]" />
+                <BlueprintIcon size={20} className="text-[var(--color-amber)]" />
               </div>
               <div className="flex-1">
                 <p className="font-display text-sm font-semibold text-[var(--color-ink)]">
@@ -68,7 +69,8 @@ export function Footer() {
               </div>
               <Link
                 href="/contact"
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-ink)] text-white transition-transform hover:scale-105"
+                aria-label="Sign up for product updates"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--color-ink)] text-white transition-transform hover:scale-105"
               >
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
@@ -76,7 +78,7 @@ export function Footer() {
           </div>
 
           {/* Links columns */}
-          <div className="grid grid-cols-3 gap-8 lg:col-span-7">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-7">
             {/* Products */}
             <div>
               <h3 className="font-display text-sm font-bold text-[var(--color-ink)]">

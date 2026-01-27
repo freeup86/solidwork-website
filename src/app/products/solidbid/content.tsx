@@ -1,39 +1,39 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import { useScrollRevealContainer } from '@/hooks/use-scroll-reveal';
 import { Button } from '@/components/ui/button';
 import { LeadDrawer } from '@/components/lead-drawer';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import {
-  ArrowRight,
-  FileText,
-  Cable,
-  Clock,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  ChevronDown,
-  Download,
-  Zap,
-} from 'lucide-react';
+  TakeoffIcon,
+  WireSpoolIcon,
+  LaborClockIcon,
+  SpecFlagIcon,
+  TechCheckIcon,
+  TechXIcon,
+  ExportIcon,
+  PilotBadgeIcon,
+} from '@/components/icons/trade-icons';
 
 const outcomes = [
   {
-    icon: FileText,
+    Icon: TakeoffIcon,
     title: 'Combined Materials List',
     description: 'Device counts across all sheets, using the legend as ground truth.',
   },
   {
-    icon: Cable,
+    Icon: WireSpoolIcon,
     title: 'Wire List by Gauge',
     description: 'Rough footage estimates broken down by wire type (14, 12, 10 AWG, etc.).',
   },
   {
-    icon: Clock,
+    Icon: LaborClockIcon,
     title: 'Baseline Labor Estimate',
     description: 'Starting man-hours based on device counts. Fully editable.',
   },
   {
-    icon: AlertTriangle,
+    Icon: SpecFlagIcon,
     title: 'Classified Notes',
     description: 'Spec flags like night work, KAIC requirements, trenching—with page references.',
   },
@@ -103,15 +103,19 @@ const faqs = [
   },
 ];
 
-function FAQItem({ question, answer }: { question: string; answer: string }) {
+function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
   const [isOpen, setIsOpen] = useState(false);
+  const panelId = `faq-panel-${index}`;
+  const buttonId = `faq-button-${index}`;
 
   return (
     <div className="border-b border-[var(--color-border)]">
       <button
+        id={buttonId}
         className="flex w-full items-center justify-between py-6 text-left group"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
+        aria-controls={panelId}
       >
         <span className="font-display text-lg font-semibold text-[var(--color-ink)] group-hover:text-[var(--color-amber)] transition-colors">
           {question}
@@ -122,7 +126,12 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
           />
         </div>
       </button>
-      <div className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] pb-6' : 'grid-rows-[0fr]'}`}>
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={buttonId}
+        className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] pb-6' : 'grid-rows-[0fr]'}`}
+      >
         <div className="overflow-hidden">
           <p className="text-[var(--color-slate)] leading-relaxed">{answer}</p>
         </div>
@@ -131,34 +140,9 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-// Scroll reveal hook
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    );
-
-    const elements = ref.current?.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-    elements?.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
-
-  return ref;
-}
-
 export function SolidBidContent() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const scrollRef = useScrollReveal();
+  const scrollRef = useScrollRevealContainer();
 
   return (
     <div ref={scrollRef}>
@@ -171,7 +155,7 @@ export function SolidBidContent() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="animate-fade-in-up">
               <span className="badge badge-amber">
-                <Zap className="h-3.5 w-3.5" />
+                <PilotBadgeIcon size={14} />
                 Now in Pilot
               </span>
             </div>
@@ -210,7 +194,7 @@ export function SolidBidContent() {
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-ink)]">
-                  <outcome.icon className="h-8 w-8 text-[var(--color-amber)]" />
+                  <outcome.Icon size={32} className="text-[var(--color-amber)]" />
                 </div>
                 <h3 className="mt-6 font-display text-xl font-bold text-[var(--color-ink)]">
                   {outcome.title}
@@ -241,7 +225,7 @@ export function SolidBidContent() {
               >
                 {/* Connector line */}
                 {index < steps.length - 1 && (
-                  <div className="absolute right-0 top-7 hidden h-0.5 w-full bg-gradient-to-r from-[var(--color-amber)] to-[var(--color-border)] md:block" style={{ left: '50%' }} />
+                  <div className="absolute right-0 top-7 hidden h-0.5 w-full bg-[var(--color-border)] md:block" style={{ left: '50%' }} />
                 )}
                 <div className="relative flex flex-col items-center text-center md:items-start md:text-left">
                   <div className="step-number">
@@ -273,14 +257,14 @@ export function SolidBidContent() {
             <div className="reveal rounded-2xl border-2 border-green-200 bg-green-50/50 p-8" style={{ transitionDelay: '100ms' }}>
               <h3 className="flex items-center gap-3 font-display text-xl font-bold text-green-800">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
+                  <TechCheckIcon size={24} className="text-green-600" />
                 </div>
                 SolidBid IS
               </h3>
               <ul className="mt-6 space-y-4">
                 {isItems.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
+                    <TechCheckIcon size={20} className="mt-0.5 flex-shrink-0 text-green-600" />
                     <span className="text-[var(--color-slate)]">{item}</span>
                   </li>
                 ))}
@@ -289,14 +273,14 @@ export function SolidBidContent() {
             <div className="reveal rounded-2xl border-2 border-red-200 bg-red-50/50 p-8" style={{ transitionDelay: '200ms' }}>
               <h3 className="flex items-center gap-3 font-display text-xl font-bold text-red-800">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100">
-                  <XCircle className="h-6 w-6 text-red-600" />
+                  <TechXIcon size={24} className="text-red-600" />
                 </div>
                 SolidBid IS NOT
               </h3>
               <ul className="mt-6 space-y-4">
                 {isntItems.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" />
+                    <TechXIcon size={20} className="mt-0.5 flex-shrink-0 text-red-500" />
                     <span className="text-[var(--color-slate)]">{item}</span>
                   </li>
                 ))}
@@ -322,7 +306,7 @@ export function SolidBidContent() {
           <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row">
             <div className="reveal flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 px-8 py-5 backdrop-blur-sm" style={{ transitionDelay: '100ms' }}>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-amber)]/10">
-                <Download className="h-6 w-6 text-[var(--color-amber)]" />
+                <ExportIcon size={24} className="text-[var(--color-amber)]" />
               </div>
               <div>
                 <p className="font-display font-bold text-white">Excel</p>
@@ -331,7 +315,7 @@ export function SolidBidContent() {
             </div>
             <div className="reveal flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 px-8 py-5 backdrop-blur-sm" style={{ transitionDelay: '200ms' }}>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-amber)]/10">
-                <Download className="h-6 w-6 text-[var(--color-amber)]" />
+                <ExportIcon size={24} className="text-[var(--color-amber)]" />
               </div>
               <div>
                 <p className="font-display font-bold text-white">PDF Summary</p>
@@ -351,8 +335,8 @@ export function SolidBidContent() {
             </h2>
           </div>
           <div className="reveal mt-12" style={{ transitionDelay: '100ms' }}>
-            {faqs.map((faq) => (
-              <FAQItem key={faq.question} question={faq.question} answer={faq.answer} />
+            {faqs.map((faq, index) => (
+              <FAQItem key={faq.question} question={faq.question} answer={faq.answer} index={index} />
             ))}
           </div>
         </div>
@@ -361,7 +345,7 @@ export function SolidBidContent() {
       {/* CTA */}
       <section className="bg-[var(--background-warm)] py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          <div className="reveal relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--color-ink)] to-[var(--color-charcoal)]">
+          <div className="reveal relative overflow-hidden rounded-3xl bg-[var(--color-ink)]">
             <div className="absolute inset-0 texture-dots opacity-20" />
             <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-[var(--color-amber)] opacity-20 blur-3xl" />
 

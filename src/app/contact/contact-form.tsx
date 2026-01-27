@@ -4,23 +4,11 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
-import { CheckCircle, ArrowRight, Zap } from 'lucide-react';
-
-const leadSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  name: z.string().optional(),
-  company: z.string().optional(),
-  role: z.enum(['owner', 'estimator', 'ops', 'other']).optional(),
-  trade: z.enum(['electrical', 'hvac', 'plumbing', 'general', 'other']).optional(),
-  estimate_volume: z.string().optional(),
-  pain_point: z.string().max(2000).optional(),
-  website: z.string().max(0, 'This field should be empty'),
-});
-
-type LeadFormData = z.infer<typeof leadSchema>;
+import { ArrowRight } from 'lucide-react';
+import { TechCheckIcon, PilotBadgeIcon } from '@/components/icons/trade-icons';
+import { leadFormSchema, type LeadFormData } from '@/lib/schemas';
 
 export default function ContactForm() {
   const searchParams = useSearchParams();
@@ -33,11 +21,11 @@ export default function ContactForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LeadFormData>({
-    resolver: zodResolver(leadSchema),
+    resolver: zodResolver(leadFormSchema),
   });
 
   const onSubmit = async (data: LeadFormData) => {
-    if (data.website) {
+    if (data.hp_field) {
       showToast('Something went wrong. Please try again.', 'error');
       return;
     }
@@ -66,7 +54,7 @@ export default function ContactForm() {
       <div className="py-24 lg:py-32">
         <div className="mx-auto max-w-xl px-5 text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-green-100">
-            <CheckCircle className="h-10 w-10 text-green-600" />
+            <TechCheckIcon size={40} className="text-green-600" />
           </div>
           <h1 className="mt-8 font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
             Thanks for reaching out!
@@ -76,13 +64,13 @@ export default function ContactForm() {
           </p>
           <div className="mt-10 rounded-xl border border-[var(--color-border)] bg-[var(--background-warm)] p-6">
             <p className="font-display font-semibold text-[var(--color-ink)]">
-              Want to schedule a call now?
+              While you wait
             </p>
             <p className="mt-2 text-sm text-[var(--color-slate)]">
-              Skip the wait and book a time directly.
+              Learn more about how SolidBid can help your estimating workflow.
             </p>
-            <Button href="https://calendly.com" className="mt-4" variant="secondary">
-              Book a Time
+            <Button href="/products/solidbid" className="mt-4" variant="secondary">
+              Explore SolidBid
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
@@ -100,7 +88,7 @@ export default function ContactForm() {
           <div className="mx-auto max-w-2xl text-center">
             <div className="inline-flex">
               <span className="badge badge-amber">
-                <Zap className="h-3.5 w-3.5" />
+                <PilotBadgeIcon size={14} />
                 {sourceProduct === 'solidbid' ? 'Pilot Request' : 'Get in Touch'}
               </span>
             </div>
@@ -123,7 +111,7 @@ export default function ContactForm() {
             {/* Honeypot */}
             <input
               type="text"
-              {...register('website')}
+              {...register('hp_field')}
               className="hidden"
               tabIndex={-1}
               autoComplete="off"

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFocusTrap } from '@/hooks/use-focus-trap';
+import { SolidBoltIcon } from '@/components/icons/trade-icons';
 
 const navLinks = [
   { href: '/products', label: 'Products' },
@@ -14,14 +15,14 @@ const navLinks = [
 function Logo() {
   return (
     <Link href="/" className="group flex items-center gap-3 transition-all duration-300">
-      {/* Icon mark with wire/electrical motif */}
+      {/* Hex bolt mark — universal across all trades */}
       <div className="relative flex h-11 w-11 items-center justify-center">
         {/* Background shape */}
         <div className="absolute inset-0 rounded-xl bg-[var(--color-ink)] transition-transform duration-300 group-hover:scale-105" />
         {/* Glow effect on hover */}
         <div className="absolute inset-0 rounded-xl bg-[var(--color-amber)] opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-40" />
-        {/* Icon */}
-        <Zap className="relative h-6 w-6 fill-[var(--color-amber)] text-[var(--color-amber)] transition-transform duration-300 group-hover:scale-110" />
+        {/* Logo — hex bolt head, the fastener every trade knows */}
+        <SolidBoltIcon size={24} className="relative text-[var(--color-amber)] transition-transform duration-300 group-hover:scale-110" />
       </div>
       {/* Wordmark */}
       <div className="hidden sm:block">
@@ -39,6 +40,8 @@ function Logo() {
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(mobileMenuRef, mobileMenuOpen);
 
   // Track scroll for header background change
   useEffect(() => {
@@ -49,6 +52,17 @@ export function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [mobileMenuOpen]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -140,6 +154,10 @@ export function Header() {
 
       {/* Mobile menu panel */}
       <div
+        ref={mobileMenuRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation"
         className={`fixed inset-y-0 right-0 z-40 w-full max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}

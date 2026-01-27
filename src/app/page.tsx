@@ -1,130 +1,44 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useScrollRevealContainer } from '@/hooks/use-scroll-reveal';
 import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { ArrowRight } from 'lucide-react';
 import {
-  ArrowRight,
-  FileText,
-  Receipt,
-  Shield,
-  Zap,
-  Target,
-  Users,
-  Wrench,
-  Clock,
-} from 'lucide-react';
-
-const products = [
-  {
-    name: 'SolidBid',
-    tagline: 'Upload plans. Get a solid bid.',
-    description:
-      'Turn electrical PDFs into material counts, wire lists, and baseline labor estimates. Stop counting symbols by hand.',
-    href: '/products/solidbid',
-    status: 'pilot' as const,
-    icon: FileText,
-    gradient: 'from-amber-500/20 to-orange-500/20',
-  },
-  {
-    name: 'PaperTrail',
-    tagline: 'Receipts that actually get done.',
-    description:
-      'Employees snap receipts. Owners see who spent what. No more paper folders or chasing people down.',
-    href: '/products',
-    status: 'coming' as const,
-    icon: Receipt,
-    gradient: 'from-blue-500/20 to-cyan-500/20',
-  },
-  {
-    name: 'CityShield',
-    tagline: 'Know before you get fined.',
-    description:
-      'Automatic compliance checks for local labor laws. Upload schedules, catch violations before payroll.',
-    href: '/products',
-    status: 'coming' as const,
-    icon: Shield,
-    gradient: 'from-emerald-500/20 to-teal-500/20',
-  },
-];
+  HardHatIcon,
+  PrecisionIcon,
+  SimplicityIcon,
+  CrewIcon,
+  PilotBadgeIcon,
+} from '@/components/icons/trade-icons';
+import { products } from '@/lib/products';
 
 const valueProps = [
   {
-    icon: Wrench,
+    Icon: HardHatIcon,
     title: 'Built for the field',
     description: 'Mobile-first, PDF-first. Works the way you already work.',
   },
   {
-    icon: Target,
+    Icon: PrecisionIcon,
     title: 'Honest about limits',
     description: 'We give you a solid starting point, not false promises. You stay in control.',
   },
   {
-    icon: Zap,
+    Icon: SimplicityIcon,
     title: 'No enterprise bloat',
     description: 'Simple tools that do one thing well. No 6-month implementations.',
   },
   {
-    icon: Users,
+    Icon: CrewIcon,
     title: 'Trade-tested',
     description: 'Built with real contractors, estimators, and ops leads. Not in a lab.',
   },
 ];
 
-function StatusBadge({ status }: { status: 'live' | 'pilot' | 'coming' }) {
-  const styles = {
-    live: 'badge-success',
-    pilot: 'badge-amber',
-    coming: 'badge-muted',
-  };
-
-  const labels = {
-    live: 'Live',
-    pilot: 'Pilot',
-    coming: 'Coming Soon',
-  };
-
-  const icons = {
-    live: <span className="h-1.5 w-1.5 rounded-full bg-green-500" />,
-    pilot: <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />,
-    coming: <Clock className="h-3 w-3" />,
-  };
-
-  return (
-    <span className={`badge ${styles[status]}`}>
-      {icons[status]}
-      {labels[status]}
-    </span>
-  );
-}
-
-// Scroll reveal hook inline
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    );
-
-    const elements = ref.current?.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-    elements?.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
-
-  return ref;
-}
-
 export default function HomePage() {
-  const scrollRef = useScrollReveal();
+  const scrollRef = useScrollRevealContainer();
 
   return (
     <div ref={scrollRef}>
@@ -144,7 +58,7 @@ export default function HomePage() {
               {/* Badge */}
               <div className="animate-fade-in-up">
                 <span className="badge badge-amber">
-                  <Zap className="h-3.5 w-3.5" />
+                  <PilotBadgeIcon size={14} />
                   Now accepting pilot partners
                 </span>
               </div>
@@ -180,13 +94,13 @@ export default function HomePage() {
 
               {/* Social proof snippet */}
               <div className="mt-12 flex items-center gap-4 animate-fade-in-up delay-400">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map((i) => (
+                <div className="flex -space-x-2" aria-hidden="true">
+                  {['JM', 'KR', 'DW'].map((initials) => (
                     <div
-                      key={i}
+                      key={initials}
                       className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-[var(--color-muted)] font-display text-xs font-bold text-[var(--color-slate)]"
                     >
-                      {['JM', 'KR', 'DW'][i - 1]}
+                      {initials}
                     </div>
                   ))}
                 </div>
@@ -197,10 +111,10 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right column - Visual element */}
-            <div className="relative hidden lg:block animate-fade-in delay-200">
+            {/* Right column - Visual element (visible on md+) */}
+            <div className="relative mt-12 animate-fade-in delay-200 lg:mt-0">
               {/* Mock interface card */}
-              <div className="relative rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-2xl">
+              <div className="relative rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-2xl sm:p-6">
                 {/* Window dots */}
                 <div className="mb-4 flex gap-2">
                   <div className="h-3 w-3 rounded-full bg-red-400" />
@@ -209,9 +123,9 @@ export default function HomePage() {
                 </div>
 
                 {/* Mock content */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="font-display text-lg font-bold text-[var(--color-ink)]">
+                    <div className="font-display text-base font-bold text-[var(--color-ink)] sm:text-lg">
                       Material Takeoff
                     </div>
                     <span className="badge badge-success">
@@ -231,15 +145,15 @@ export default function HomePage() {
                   ].map((row, i) => (
                     <div
                       key={row.label}
-                      className="flex items-center justify-between rounded-lg bg-[var(--color-muted)]/50 px-4 py-3"
+                      className="flex items-center justify-between rounded-lg bg-[var(--color-muted)]/50 px-3 py-2.5 sm:px-4 sm:py-3"
                       style={{ animationDelay: `${400 + i * 100}ms` }}
                     >
-                      <span className="text-sm text-[var(--color-slate)]">{row.label}</span>
-                      <div className="flex items-center gap-4">
-                        <span className="font-mono text-sm font-semibold text-[var(--color-ink)]">
+                      <span className="text-xs text-[var(--color-slate)] sm:text-sm">{row.label}</span>
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <span className="font-mono text-xs font-semibold text-[var(--color-ink)] sm:text-sm">
                           {row.count}
                         </span>
-                        <span className="font-mono text-xs text-[var(--color-steel)]">
+                        <span className="hidden font-mono text-xs text-[var(--color-steel)] sm:inline">
                           {row.wire}
                         </span>
                       </div>
@@ -247,22 +161,22 @@ export default function HomePage() {
                   ))}
 
                   {/* Summary row */}
-                  <div className="mt-4 flex items-center justify-between rounded-xl bg-[var(--color-ink)] px-4 py-3">
-                    <span className="font-display font-semibold text-white">Est. Labor Hours</span>
-                    <span className="font-mono text-xl font-bold text-[var(--color-amber)]">142h</span>
+                  <div className="mt-3 flex items-center justify-between rounded-xl bg-[var(--color-ink)] px-3 py-2.5 sm:mt-4 sm:px-4 sm:py-3">
+                    <span className="font-display text-sm font-semibold text-white sm:text-base">Est. Labor Hours</span>
+                    <span className="font-mono text-lg font-bold text-[var(--color-amber)] sm:text-xl">142h</span>
                   </div>
                 </div>
               </div>
 
-              {/* Floating accent elements */}
-              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-2xl bg-[var(--color-amber)] opacity-20 blur-2xl animate-float" />
-              <div className="absolute -bottom-4 -left-4 h-32 w-32 rounded-full bg-[var(--color-blueprint)] opacity-20 blur-2xl animate-float delay-200" />
+              {/* Floating accent elements (hidden on small screens) */}
+              <div className="absolute -right-4 -top-4 hidden h-24 w-24 rounded-2xl bg-[var(--color-amber)] opacity-20 blur-2xl animate-float sm:block" />
+              <div className="absolute -bottom-4 -left-4 hidden h-32 w-32 rounded-full bg-[var(--color-blueprint)] opacity-20 blur-2xl animate-float delay-200 sm:block" />
             </div>
           </div>
         </div>
 
-        {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-white/80" />
       </section>
 
       {/* Products Section */}
@@ -299,16 +213,16 @@ export default function HomePage() {
                 className={`reveal group glow-card card-hover relative rounded-2xl border border-[var(--color-border)] bg-white p-8`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                {/* Gradient background on hover */}
+                {/* Background tint on hover */}
                 <div
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${product.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+                  className={`absolute inset-0 rounded-2xl ${product.hoverBg} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
                 />
 
                 <div className="relative">
                   {/* Header with icon and status */}
                   <div className="flex items-start justify-between">
                     <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--color-ink)]">
-                      <product.icon className="h-7 w-7 text-[var(--color-amber)]" />
+                      <product.Icon size={28} className="text-[var(--color-amber)]" />
                     </div>
                     <StatusBadge status={product.status} />
                   </div>
@@ -363,7 +277,7 @@ export default function HomePage() {
               >
                 {/* Icon */}
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-amber)]/10 transition-colors hover:bg-[var(--color-amber)]/20">
-                  <prop.icon className="h-8 w-8 text-[var(--color-amber)]" />
+                  <prop.Icon size={32} className="text-[var(--color-amber)]" />
                 </div>
 
                 {/* Content */}
@@ -398,7 +312,7 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          <div className="reveal relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--color-ink)] to-[var(--color-charcoal)]">
+          <div className="reveal relative overflow-hidden rounded-3xl bg-[var(--color-ink)]">
             {/* Pattern overlay */}
             <div className="absolute inset-0 texture-dots opacity-20" />
 

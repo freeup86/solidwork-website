@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { X, CheckCircle, AlertCircle, Zap } from 'lucide-react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
+import { X } from 'lucide-react';
+import { TechCheckIcon, SpecFlagIcon, SolidBoltIcon } from '@/components/icons/trade-icons';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -27,6 +28,16 @@ export function useToast() {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Clean up all timeouts on unmount
+  useEffect(() => {
+    const timeouts = timeoutsRef.current;
+    return () => {
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.clear();
+    };
+  }, []);
 
   const showToast = useCallback((message: string, type: ToastType = 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -40,19 +51,26 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     });
 
     // Auto-dismiss after 5 seconds
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
+      timeoutsRef.current.delete(id);
     }, 5000);
+    timeoutsRef.current.set(id, timeout);
   }, []);
 
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
+    const timeout = timeoutsRef.current.get(id);
+    if (timeout) {
+      clearTimeout(timeout);
+      timeoutsRef.current.delete(id);
+    }
   }, []);
 
   const icons = {
-    success: <CheckCircle className="h-5 w-5 text-green-600" />,
-    error: <AlertCircle className="h-5 w-5 text-red-600" />,
-    info: <Zap className="h-5 w-5 text-[var(--color-amber)]" />,
+    success: <TechCheckIcon size={20} className="text-green-600" />,
+    error: <SpecFlagIcon size={20} className="text-red-600" />,
+    info: <SolidBoltIcon size={20} className="text-[var(--color-amber)]" />,
   };
 
   const styles = {

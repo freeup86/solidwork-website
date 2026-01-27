@@ -6,7 +6,7 @@
   --color-charcoal: #1a1a1f;
   --color-graphite: #2a2a32;
   --color-slate: #4a4a58;
-  --color-steel: #7a7a8c;
+  --color-steel: #64647a;
   --color-silver: #b8b8c8;
 
   /* Accent - Electric Amber */
@@ -14,6 +14,7 @@
   --color-amber-bright: #fbbf24;
   --color-amber-deep: #d97706;
   --color-amber-glow: rgba(245, 158, 11, 0.15);
+  --color-accent: #f59e0b;
 
   /* Secondary - Blueprint Blue */
   --color-blueprint: #3b82f6;
@@ -65,7 +66,7 @@
   --color-success-bg: var(--success-bg);
   --color-error: var(--error);
   --color-error-bg: var(--error-bg);
-  --font-display: var(--font-space-grotesk);
+  --font-display: var(--font-outfit);
   --font-body: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
 }
@@ -150,20 +151,6 @@ h1, h2, h3, h4, h5, h6 {
 /* ============================================
    TEXTURES & PATTERNS
    ============================================ */
-
-.texture-noise {
-  position: relative;
-}
-
-.texture-noise::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.03;
-  pointer-events: none;
-  z-index: 1;
-}
 
 .texture-grid {
   background-image:
@@ -452,11 +439,6 @@ a, button, [role="button"] {
   box-shadow: var(--shadow-lg);
 }
 
-/* Magnetic hover effect for buttons */
-.magnetic {
-  transition: transform 0.2s ease-out;
-}
-
 /* Link underline animation */
 .link-underline {
   position: relative;
@@ -550,34 +532,9 @@ a, button, [role="button"] {
    DECORATIVE ELEMENTS
    ============================================ */
 
-/* Wire/cable decorative line */
-.wire-line {
-  position: relative;
-}
-
-.wire-line::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--color-amber) 10%,
-    var(--color-amber) 90%,
-    transparent 100%
-  );
-  border-radius: 2px;
-}
-
 /* Glow effect */
 .glow {
   box-shadow: var(--shadow-glow);
-}
-
-.glow-sm {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
 }
 
 /* Badge styles */
@@ -617,22 +574,12 @@ a, button, [role="button"] {
 
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--border) 20%,
-    var(--border) 80%,
-    transparent 100%
-  );
+  background: var(--border);
 }
 
 .section-divider-amber {
   height: 2px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--color-amber) 30%,
-    var(--color-amber) 70%,
-    transparent 100%
-  );
+  background: var(--color-amber);
 }
 
 /* ============================================
@@ -652,22 +599,20 @@ a, button, [role="button"] {
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  padding: 2px;
-  background: linear-gradient(135deg, var(--color-amber), var(--color-amber-deep), var(--color-blueprint));
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  border: 2px solid var(--color-amber);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .glow-card:hover::before {
   opacity: 1;
+}
+
+/* Show subtle glow on touch devices since hover isn't available */
+@media (hover: none) {
+  .glow-card::before {
+    opacity: 0.3;
+  }
 }
 
 /* Number badge for steps */

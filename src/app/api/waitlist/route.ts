@@ -1,33 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-
-const waitlistSchema = z.object({
-  email: z.string().email(),
-  product_interest: z.enum(['papertrail', 'cityshield', 'general']),
-  source_page: z.string().optional(),
-});
-
-// Rate limiting map
-const rateLimit = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 10;
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimit.get(ip);
-
-  if (!record || now > record.resetTime) {
-    rateLimit.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return true;
-  }
-
-  if (record.count >= RATE_LIMIT) {
-    return false;
-  }
-
-  record.count++;
-  return true;
-}
+import { waitlistSchema } from '@/lib/schemas';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { query } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,33 +17,35 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-
     const result = waitlistSchema.safeParse(body);
+
     if (!result.success) {
+      const firstError = result.error.issues[0];
       return NextResponse.json(
-        { success: false, error: 'Invalid email format' },
+        { success: false, error: firstError?.message || 'Invalid input' },
         { status: 400 }
       );
     }
 
     const data = result.data;
 
-    // In production, store in Supabase
-    console.log('New waitlist signup:', {
-      email: data.email,
-      product_interest: data.product_interest,
-      source_page: data.source_page,
-      timestamp: new Date().toISOString(),
-    });
+    if (data.hp_field && data.hp_field.length > 0) {
+      return NextResponse.json(
+        { success: true, message: "You're on the list!" },
+        { status: 201 }
+      );
+    }
 
-    // TODO: Uncomment when Supabase is configured
-    // const supabase = createClient();
-    // const { error } = await supabase.from('waitlist').insert({
-    //   email: data.email,
-    //   product_interest: data.product_interest,
-    //   source_page: data.source_page,
-    // });
-    // if (error) throw error;
+    try {
+      await query(
+        `INSERT INTO waitlist (email, product_interest, source_page, ip_address, created_at)
+         VALUES ($1, $2, $3, $4, NOW())`,
+        [data.email, data.product_interest, data.source_page || null, ip]
+      );
+    } catch (dbError) {
+      console.error('Database insert failed, waitlist data:', { email: data.email, timestamp: new Date().toISOString() });
+      console.error('DB error:', dbError);
+    }
 
     return NextResponse.json(
       { success: true, message: "You're on the list!" },
