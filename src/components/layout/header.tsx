@@ -9,6 +9,7 @@ import { SolidBoltIcon } from '@/components/icons/trade-icons';
 const navLinks = [
   { href: '/products', label: 'Products' },
   { href: '/products/solidbid', label: 'SolidBid' },
+  { href: '/pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
 ];
 

@@ -5,6 +5,7 @@ import { SolidBoltIcon, BlueprintIcon } from '@/components/icons/trade-icons';
 const footerLinks = {
   products: [
     { href: '/products/solidbid', label: 'SolidBid' },
+    { href: '/pricing', label: 'Pricing' },
     { href: '/products', label: 'All Products' },
   ],
   company: [
