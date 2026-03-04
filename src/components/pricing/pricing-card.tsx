@@ -24,7 +24,7 @@ export function PricingCard({ tier, isYearly }: PricingCardProps) {
     >
       {/* Popular badge */}
       {tier.badge && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+        <div className="absolute -top-3.5 left-1/2 z-10 -translate-x-1/2 bg-white px-2">
           <span className="badge badge-amber whitespace-nowrap text-xs">
             {tier.badge}
           </span>
